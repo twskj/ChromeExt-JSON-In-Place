@@ -20,7 +20,7 @@ Consider this JSON as our input:
 {"hello": "world", "embeded": "{\"hello\":\"world\"}"}
 ```
 
-*Format JSON* yields 
+**Format JSON** yields 
 ```js
 {
    "hello": "world",
@@ -28,7 +28,7 @@ Consider this JSON as our input:
 }
 ```
 
-*Format Escaped JSON* yields
+**Format Escaped JSON** yields
 ```js
 {
    "hello": "world",
@@ -39,7 +39,7 @@ Consider this JSON as our input:
 ```
 
 # Note
-Jipy will perform JSON extraction when the highlight portion is not a valid JSON.
+Jipy uses highlight portion as guideline. If it is a valid json, Jipy will format that portion. If it isn't Jipy will try to extract JSON from that DOM.
 
 
 ## Support on Beerpay
