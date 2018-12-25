@@ -47,6 +47,9 @@ function addCSS() {
 
 function extractJSONs(str) {
     var jsons = [];
+    if (!str) {
+        return jsons;
+    }
     var numbers = new Set(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'])
     var state = getInitialState();
 
@@ -237,6 +240,7 @@ function computeStartEnd(html, prefix, text) {
 
     var current_idx = 0;
     var runner = 0;
+    prefix = prefix.trim();
     if (prefix) {
         for (; current_idx < html.length; current_idx++) {
             var ch = html[current_idx];
@@ -269,9 +273,6 @@ function computeStartEnd(html, prefix, text) {
                     current_idx++;
                     break;
                 }
-            }
-            else {
-                console.log("doesn't match");
             }
         }
     }
@@ -320,7 +321,7 @@ function wrapWithPreCode(node, prefix, formattedText, text) {
     var html = node.innerHTML;
     var [start, end] = computeStartEnd(html, prefix, text);
     if (start === -1) {
-        return;
+        return "Cannot Align";
     }
     prefix = html.substr(0, start);
     var suffix = html.substr(end + 1);
@@ -342,8 +343,9 @@ function replaceAsIs(node, prefix, text, suffix) {
 
 function replace(node, text, unEscapeMode) {
 
+    var tmp;
     try {
-        var tmp = JSON.parse(text);
+        tmp = JSON.parse(text);
     }
     catch (err) {
         return err;
@@ -371,10 +373,10 @@ function replace(node, text, unEscapeMode) {
 
     if (nodeType === "TEXTAREA") {
         var suffix = original.substr(end_idx);
-        replaceAsIs(node, prefix, formattedText, suffix);
+        return replaceAsIs(node, prefix, formattedText, suffix);
     }
     else {
-        wrapWithPreCode(node, prefix, formattedText, text);
+        return wrapWithPreCode(node, prefix, formattedText, text);
     }
 }
 
