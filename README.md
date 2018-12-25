@@ -1,6 +1,6 @@
 # Jipy (JSON In-Place)
 
-A Chrome Extension that allows you to format JSON in browser. Unlike other formatters, Jipy does not rely on the whole page being return as JSON. Jipy works by let you choose the portion of text that you want to format. This enables you to format any embeded JSON.
+A Chrome Extension that allows you to format JSON on any sites. Unlike other formatters, Jipy does not rely on the whole page being return as JSON. Jipy works by let you choose the portion of text that you want to format. This enables you to format any embeded JSON.
 
 # Usage
 1. Highlight portion you want to format (whole or partial)
