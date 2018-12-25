@@ -3,9 +3,9 @@
 A Chrome Extension that allows you to format JSON on any page. Unlike other formatters, Jipy does not rely on the whole page being return as JSON. Jipy works by letting you choose the portion that you want to format. This enables you to format any embeded JSON.
 
 # Usage
-1. Highlight portion you want to format (whole or partial)
+1. Highlight the portion you want to format (whole or partial)
 2. Format
-    - Use hotkey (Alt+F)
+    - Use hotkey (Alt+F),(Alt+Shift+F)
     - Use context menu (Right-Click > `Format JSON`)
     - Use extension button (located at top right corner)
 3. Enjoy!
