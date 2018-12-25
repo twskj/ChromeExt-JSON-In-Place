@@ -39,7 +39,7 @@ Consider this JSON as our input:
 ```
 
 # Note
-Jipy uses highlight portion as guideline. If it is a valid json, Jipy will format that portion. If it isn't Jipy will try to extract JSON from that DOM.
+Jipy uses highlight portion as its guideline. If it is a valid json, Jipy will format that portion. If it isn't Jipy will try to extract JSON(s) from that DOM.
 
 
 ## Support on Beerpay
