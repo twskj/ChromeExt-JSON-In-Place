@@ -16,12 +16,12 @@ A Chrome Extension that allows you to format JSON in browser. Unlike other forma
 
 ### For example
 Consider this JSON as our input:
-```json
+```js
 {"hello": "world", "embeded": "{\"hello\":\"world\"}"}
 ```
 
 *Format JSON* yields 
-```json
+```js
 {
    "hello": "world",
    "embeded": "{\"hello\":\"world\"}"
@@ -29,7 +29,7 @@ Consider this JSON as our input:
 ```
 
 *Format Escaped JSON* yields
-```json
+```js
 {
    "hello": "world",
    "embeded": {
