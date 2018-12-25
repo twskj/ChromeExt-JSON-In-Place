@@ -17,7 +17,7 @@ A Chrome Extension that allows you to format JSON in browser. Unlike other forma
 ### For example
 Consider this JSON as our input:
 ```json
-{"hello": "world", "embeded": "{\\"hello\\":\\"world\\"}"}
+{"hello": "world", "embeded": "{\"hello\":\"world\"}"}
 ```
 
 *Format JSON* yields 
