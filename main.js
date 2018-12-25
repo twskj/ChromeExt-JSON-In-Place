@@ -493,7 +493,6 @@ chrome.runtime.onMessage.addListener(
                 }
             }
             var longtext = node.innerText || node.value;
-            longtext = longtext.replace(/\\"/g, '"');
             var candidates = extractJSONs(longtext);
 
             if (candidates.length === 0) {
