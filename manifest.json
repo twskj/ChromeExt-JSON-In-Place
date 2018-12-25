@@ -2,7 +2,7 @@
     "name": "Jipy",
     "short_name": "Jipy",
     "version": "0.1.0",
-    "description": "Jipy is a JSON formatter which formats JSON In Place!",
+    "description": "Format JSON In Place. Anywhere!",
     "author": "twskj",
     "browser_action": {
         "default_icon": {
