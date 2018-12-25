@@ -1,7 +1,7 @@
 {
     "name": "Jipy",
     "short_name": "Jipy",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "Jipy is a JSON formatter which formats JSON In Place!",
     "author": "twskj",
     "browser_action": {
@@ -30,9 +30,7 @@
         }
     ],
     "permissions": [
-        "activeTab",
-        "contextMenus",
-        "commands"
+        "contextMenus"
     ],
     "commands": {
         "FormatJSON": {
@@ -55,6 +53,7 @@
         "32": "icon/32.png",
         "38": "icon/38.png",
         "48": "icon/48.png",
+        "64": "icon/64.png",
         "128": "icon/128.png"
     },
     "manifest_version": 2
