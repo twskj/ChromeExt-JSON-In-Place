@@ -1,6 +1,13 @@
+v0.1.2 [Dec 26, 2018]
+- improve json extraction performance
+
+v0.1.1 [Dec 25, 2018]
+- fixed leading whitespace causing payload not being recognized
+
 v0.1.0 [Dec 25, 2018]
 - extract json instead of guessing {},[]
 - using innerHTML instead of adding DOM
 - flash feedback when cannot parse
+
 v0.0.1 [Dec 12, 2018]
 - working POC

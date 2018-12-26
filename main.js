@@ -13,10 +13,13 @@ function getInitialState() {
 }
 
 function popUntil(stack, val) {
-    while (stack.length > 0) {
-        if (val === stack.pop()) {
+    var i = stack.length - 1;
+    while (i > -1) {
+        if (val === stack[i]) {
+            stack.length = i;
             return;
         }
+        i--;
     }
 }
 
