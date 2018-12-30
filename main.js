@@ -239,7 +239,7 @@ function extractJSONs(str) {
 var decoder;
 function decodeHTML(str, idx) {
     if (!decoder) {
-        decoder = document.createElement("div");
+        decoder = document.createElement("textarea");
     }
 
     var i = idx;
