@@ -1,7 +1,7 @@
 {
     "name": "Jipy",
     "short_name": "Jipy",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "description": "Format JSON In Place. Anywhere!",
     "author": "twskj",
     "browser_action": {
