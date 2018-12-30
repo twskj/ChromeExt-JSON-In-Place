@@ -236,6 +236,24 @@ function extractJSONs(str) {
     return jsons;
 }
 
+var decoder;
+function decodeHTML(str, idx) {
+    if (!decoder) {
+        decoder = document.createElement("div");
+    }
+
+    var i = idx;
+    for (; i < str.length; i++) {
+        if (str[i] === ';') {
+            break;
+        }
+    }
+
+    var length = i - idx + 1;
+    decoder.innerHTML = str.substr(idx, length);
+    return [decoder.innerText, length];
+}
+
 function computeStartEnd(html, prefix, text) {
     var start = -1;
     var tag = false;
@@ -263,6 +281,15 @@ function computeStartEnd(html, prefix, text) {
             if (ch === "<") {
                 tag = true;
                 continue;
+            }
+
+            if (ch === '&') {
+                var [ch, tokenLength] = decodeHTML(html, current_idx);
+                current_idx += tokenLength - 1;
+
+                if (whitespace.has(ch)) {
+                    continue;
+                }
             }
 
             if (ch === prefix[runner]) {
