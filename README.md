@@ -45,9 +45,9 @@ Consider this JSON as our input:
 Jipy uses highlight portion as its guideline. If it is a valid json, Jipy will format that portion. If it isn't Jipy will try to extract JSON(s) from that DOM.
 
 # Try it out!
-Install Jipy and try to format this embeded JSONs
+Install Jipy and try to format this embeded JSONs. The example JSONs are taken from http://json.org/example.html
 
-```python
+```
 import json
 
 examples = [
