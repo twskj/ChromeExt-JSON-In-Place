@@ -356,7 +356,7 @@ function wrapWithPreCode(node, prefix, formattedText, text) {
     prefix = html.substr(0, start);
     var suffix = html.substr(end + 1);
 
-    node.innerHTML = `${prefix}<div><pre><code>${escapeHtml(formattedText)}</pre></code></div>${suffix}`;
+    node.innerHTML = `${prefix}<div style="text-align:left"><pre><code>${escapeHtml(formattedText)}</pre></code></div>${suffix}`;
 }
 
 function replaceAsIs(node, prefix, text, suffix) {
@@ -412,7 +412,7 @@ function replace(node, text, unEscapeMode) {
 
 function findNodeByText(node, txt) {
     if (node.nodeType === 3) { // TEXT NODE
-        node = node.parentNode
+        node = node.parentNode;
     }
     var children = node.childNodes;
     var nodeType, val;
