@@ -1,3 +1,5 @@
+"use strict";
+
 var fmtJsonContextMenuItem = {
     "id": "Jipy:fmtJSON"
     , "title": "Format JSON"
@@ -24,7 +26,7 @@ chrome.runtime.onInstalled.addListener(function () {
     chrome.contextMenus.create(fmtJsonStringContextMenuItem);
 });
 
-chrome.browserAction.onClicked.addListener(function (tab) {
+chrome.action.onClicked.addListener(function (tab) {
     chrome.tabs.sendMessage(tab.id, fmtJsonContextMenuItem.id);
 });
 
@@ -42,5 +44,8 @@ chrome.commands.onCommand.addListener(function (cmd) {
     }
     else if (cmd === 'FormatJSONString') {
         runFormatter(fmtJsonStringContextMenuItem.id);
+    }
+    else if (cmd === 'UndoFormat') {
+        runFormatter("Jipy:undo");
     }
 });

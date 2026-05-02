@@ -1,3 +1,17 @@
+v1.0.0 [May 1, 2026]
+- migrated to Manifest V3
+- fixed numbers not recognized as first array element
+- added support for exponent notation in numbers
+- reject invalid leading zeros in numbers
+- fixed HTML closing tag order in formatted output
+- fixed escaped JSON not recursively unescaped
+- added undo (Alt+Z) to revert last format
+- fixed crash when array contains null in escaped JSON mode
+- capped undo history to prevent memory leaks
+- added strict mode
+- fixed repeated formatting nesting pre/code tags
+- fixed multiple JSONs in one node only formatting the first one
+
 v0.1.3 [Dec 29, 2018]
 - fixed html escape bug
 

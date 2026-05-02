@@ -1,3 +1,5 @@
+"use strict";
+
 function notify(err) {
     console.log(err);
 }
@@ -55,6 +57,7 @@ function extractJSONs(str) {
     }
     var numbers = new Set(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'])
     var state = getInitialState();
+    var ch;
 
     for (var i = 0; i < str.length; i++) {
         ch = str[i];
@@ -191,15 +194,20 @@ function extractJSONs(str) {
         }
         else if ((ch === "-" || numbers.has(ch))
             && (state.tokens[state.tokens.length - 1] === ':' // expecting value --> ok
+                || state.tokens[state.tokens.length - 1] === '[' // first array element
                 || (state.tokens[state.tokens.length - 1] === ',' // if previous is comma make sure it is not expecting key
                     && (state.tokens[state.tokens.length - 3] === ',' || state.tokens[state.tokens.length - 3] === '[')
                 ))) {
             var expectDacimal = false;
             var expectNumber = ch === '-';
             var seenDot = false;
+            var leadingZero = ch === '0';
 
             for (var j = i + 1; j < str.length; j++) {
                 if (numbers.has(str[j])) {
+                    if (leadingZero) {
+                        break; // 0 followed by digit is invalid (e.g. 01)
+                    }
                     i = j;
                     if (expectNumber) {
                         expectNumber = false;
@@ -210,12 +218,27 @@ function extractJSONs(str) {
                     continue;
                 }
                 else if (str[j] === '.') {
-                    i = j
+                    leadingZero = false;
+                    i = j;
                     expectDacimal = true;
                     if (seenDot) {
                         break;
                     }
-                    seendot = true;
+                    seenDot = true;
+                    continue;
+                }
+                else if (str[j] === 'e' || str[j] === 'E') {
+                    leadingZero = false;
+                    if (seenDot && expectDacimal) {
+                        break; // e right after dot is invalid
+                    }
+                    i = j;
+                    seenDot = true; // no more dots after exponent
+                    if (str[j + 1] === '+' || str[j + 1] === '-') {
+                        j++;
+                        i = j;
+                    }
+                    expectDacimal = true; // reuse: expect at least one digit after e/E
                     continue;
                 }
                 break;
@@ -347,7 +370,41 @@ function escapeHtml(text) {
         .replace(/'/g, "&#039;");
 }
 
+function replaceInTextContent(node, text, formattedText) {
+    var content = node.textContent;
+    var idx = content.indexOf(text);
+    if (idx === -1) return;
+    saveForUndo(node, "textContent");
+    node.textContent = content.substr(0, idx) + formattedText + content.substr(idx + text.length);
+}
+
 function wrapWithPreCode(node, prefix, formattedText, text) {
+    var tag = node.nodeName.toUpperCase();
+
+    // Already inside a <code> — replace just the JSON portion in its text
+    if (tag === "CODE") {
+        replaceInTextContent(node, text, formattedText);
+        return;
+    }
+
+    // Inside a <pre> — replace in existing <code> child or create one
+    if (tag === "PRE") {
+        var code = node.querySelector('code');
+        if (code) {
+            replaceInTextContent(code, text, formattedText);
+        } else {
+            replaceInTextContent(node, text, formattedText);
+        }
+        return;
+    }
+
+    // Check children for existing pre > code
+    var existing = node.querySelector('pre > code');
+    if (existing) {
+        replaceInTextContent(existing, text, formattedText);
+        return;
+    }
+
     var html = node.innerHTML;
     var [start, end] = computeStartEnd(html, prefix, text);
     if (start === -1) {
@@ -356,7 +413,8 @@ function wrapWithPreCode(node, prefix, formattedText, text) {
     prefix = html.substr(0, start);
     var suffix = html.substr(end + 1);
 
-    node.innerHTML = `${prefix}<div style="text-align:left"><pre><code>${escapeHtml(formattedText)}</pre></code></div>${suffix}`;
+    saveForUndo(node, "innerHTML");
+    node.innerHTML = `${prefix}<div style="text-align:left"><pre><code>${escapeHtml(formattedText)}</code></pre></div>${suffix}`;
 }
 
 function replaceAsIs(node, prefix, text, suffix) {
@@ -368,6 +426,7 @@ function replaceAsIs(node, prefix, text, suffix) {
     if (suffix) {
         result.push(suffix);
     }
+    saveForUndo(node, "value");
     node.value = result.join("\n");
 }
 
@@ -450,6 +509,11 @@ function unEscapeArray(arr) {
                 || (val.startsWith("[") && val.endsWith("]"))) {
                 try {
                     arr[i] = JSON.parse(val);
+                    if (Array.isArray(arr[i])) {
+                        unEscapeArray(arr[i]);
+                    } else if (arr[i] && typeof arr[i] === "object") {
+                        unEscapeObj(arr[i]);
+                    }
                 }
                 catch (err) { }
             }
@@ -457,7 +521,7 @@ function unEscapeArray(arr) {
         else if (Array.isArray(val)) {
             unEscapeArray(val);
         }
-        else if (typeof val === "object") {
+        else if (val && typeof val === "object") {
             unEscapeObj(val);
         }
     }
@@ -473,6 +537,11 @@ function unEscapeObj(obj) {
                 || (val.startsWith("[") && val.endsWith("]"))) {
                 try {
                     obj[keys[i]] = JSON.parse(val);
+                    if (Array.isArray(obj[keys[i]])) {
+                        unEscapeArray(obj[keys[i]]);
+                    } else if (obj[keys[i]] && typeof obj[keys[i]] === "object") {
+                        unEscapeObj(obj[keys[i]]);
+                    }
                 }
                 catch (err) { }
             }
@@ -486,6 +555,23 @@ function unEscapeObj(obj) {
     }
 }
 
+var undoStack = [];
+var UNDO_STACK_LIMIT = 42;
+
+function saveForUndo(node, prop) {
+    var oldVal = node[prop];
+    if (undoStack.length > 0) {
+        var last = undoStack[undoStack.length - 1];
+        if (last.node === node && last.prop === prop) {
+            return; // keep the original value already on stack
+        }
+    }
+    undoStack.push({ node: node, prop: prop, val: oldVal });
+    if (undoStack.length > UNDO_STACK_LIMIT) {
+        undoStack.shift();
+    }
+}
+
 function flash(node) {
     addCSS();
     node.classList.add("jippy-cant-parse");
@@ -495,6 +581,14 @@ function flash(node) {
 chrome.runtime.onMessage.addListener(
     function (message) {
         try {
+            if (message === "Jipy:undo") {
+                if (undoStack.length > 0) {
+                    var entry = undoStack.pop();
+                    entry.node[entry.prop] = entry.val;
+                }
+                return;
+            }
+
             if (message !== "Jipy:fmtJSON" && message !== "Jipy:fmtJSONString") {
                 return;
             }
@@ -502,6 +596,7 @@ chrome.runtime.onMessage.addListener(
             var selection = window.getSelection();
             var selectedText = selection.toString().trim();
             var node = selection.focusNode || selection.anchorNode; // anchorNode == first, focusNode == last node the selection fall on; SEE: https://developer.mozilla.org/en-US/docs/Web/API/Selection#Properties
+            var err = undefined;
             if (!node) {
                 return;
             }
@@ -533,7 +628,8 @@ chrome.runtime.onMessage.addListener(
             }
 
             var errorCount = 0;
-            for (var i = 0; i < candidates.length; i++) {
+            // Process last-to-first so earlier candidates' positions stay valid after each replacement
+            for (var i = candidates.length - 1; i >= 0; i--) {
                 err = replace(node, longtext.substr(candidates[i][0], candidates[i][1] - candidates[i][0] + 1), message === "Jipy:fmtJSONString");
                 if (err) {
                     errorCount++;
